@@ -1,0 +1,90 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+
+  },
+  "variables": {
+    "location": "North Europe",
+    "staticSubnetName": "AZNE-TMDSSubnetP",
+    "existingVirtualNetworkName": "AZNEVNET",
+    "existingVirtualNetworkResourceGroup": "AZNE-RG-Core",
+    "sqlLBIPAddress": "10.210.10.10",
+
+    "vnetID": "[resourceId(variables('existingVirtualNetworkResourceGroup'), 'Microsoft.Network/virtualNetworks', variables('existingVirtualNetworkName'))]",
+
+    "lbSubnetUri": "[concat(variables('vnetID'),'/subnets/',variables('staticSubnetName'))]",
+
+    "publicLBName": "AZNE-TMDSQLLB",
+    "sqlAOListener":"SQLAlwaysOnEndPointListener",
+    "lbFE": "SqlLBFE",
+    "lbBE": "SqlLBBE",
+    "sqllbID":"[resourceId('Microsoft.Network/loadBalancers',variables('publicLBName'))]",
+    "sqllbFEConfigID": "[concat(variables('sqllbID'),'/frontendIPConfigurations/',variables('lbFE'))]",
+    "sqlBEAddressPoolID": "[concat(variables('sqllbID'),'/backendAddressPools/',variables('lbBE'))]",
+    "sqlAOProbe":"SQLAlwaysOnEndPointProbe",
+    "sqllbProbeID":"[concat(variables('sqllbID'),'/probes/',variables('sqlAOProbe'))]"
+  },
+  "resources": [
+    {
+        "apiVersion": "2015-05-01-preview",
+        "name": "[variables('publicLBName')]",
+        "type": "Microsoft.Network/loadBalancers",
+        "location": "[variables('location')]",
+        "dependsOn": [
+        ],
+        "properties": {
+            "frontendIPConfigurations": [
+                {
+                    "name": "[variables('lbFE')]",
+                    "properties": {
+                        "privateIPAllocationMethod": "Static",
+                        "privateIPAddress" :"[variables('sqlLBIPAddress')]",
+                        "subnet": {
+                            "id": "[variables('lbSubnetUri')]"
+                        }
+                    }
+                }
+            ],
+            "backendAddressPools": [
+                {
+                    "name": "[variables('lbBE')]"
+                }
+            ],
+            "loadBalancingRules": [
+                {
+                    "name": "[variables('sqlAOListener')]",
+                    "properties": {
+                    "frontendIPConfiguration": {
+                        "id": "[variables('sqllbFEConfigID')]"
+                    },
+                    "backendAddressPool": {
+                        "id": "[variables('sqlBEAddressPoolID')]"
+                    },
+                    "probe": {
+                        "id": "[variables('sqllbProbeID')]"
+                    },
+                    "protocol": "tcp",
+                    "frontendPort": 1433,
+                    "backendPort": 1433,
+                    "enableFloatingIP": true
+                    }
+                }
+            ],
+            "probes": [
+                {
+                    "name": "[variables('sqlAOProbe')]",
+                    "properties": {
+                        "protocol": "tcp",
+                        "port": 59999,
+                        "intervalInSeconds": "5",
+                        "numberOfProbes": "2"
+                    }
+                }
+            ]
+        }
+    }
+  ],
+    "outputs": {
+    }
+}

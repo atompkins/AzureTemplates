@@ -1,0 +1,435 @@
+﻿{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vmNamePrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "The Prefix of the VM Name"
+      },
+      "defaultValue": "SqlVM"
+    },
+    "availabilitySetName": {
+      "type": "string",
+      "metadata": {
+        "description": "The Available Set Name"
+      },
+      "defaultValue": "SqlAvailableSet"
+    },
+
+    "windowsImagePublisher": {
+      "type": "string",
+      "metadata": {
+        "description": "The Publisher of Windows Image"
+      },
+      "defaultValue": "MicrosoftSQLServer"
+    },
+    "windowsImageOffer": {
+      "type": "string",
+      "metadata": {
+        "description": "The offer of Windows Image"
+      },
+      "defaultValue": "SQL2014-WS2012R2"
+    },
+    "windowsImageSKU": {
+      "type": "string",
+      "metadata": {
+        "description": "The SKU Name of Windows Image"
+      },
+      "defaultValue": "Enterprise"
+    },
+
+    "windowsImageVersion": {
+      "type": "string",
+      "metadata": {
+        "description": "The Version of Windows Image"
+      },
+      "defaultValue": "latest"
+    },
+
+    "storageAccount": {
+      "type": "string",
+      "metadata": {
+        "description": "The Storage Account Name"
+      }
+    },
+
+    "storageAccountType": {
+      "type": "string",
+      "allowedValues": [
+        "Standard_LRS",
+        "Standard_GRS",
+        "Standard_RAGRS",
+        "Premium_LRS"
+      ],
+      "metadata": {
+        "description": "The type of the Storage Account created"
+      },
+      "defaultValue": "Standard_LRS"
+    },
+    "adminUsername": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the Administrator of the new VMs and Domain"
+      },
+      "defaultValue": "sqlAdministrator"
+    },
+    "adminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The password for the Administrator account of the new VMs and Domain"
+      }
+    },
+
+    "location": {
+      "type": "string",
+      "allowedValues": [
+        "West US",
+        "East US",
+        "East US 2",
+        "Central US",
+        "South Central US",
+        "North Central US",
+        "North Europe",
+        "West Europe",
+        "East Asia",
+        "Southeast Asia",
+        "Japan East",
+        "Japan West",
+        "Southeast Asia"
+      ],
+      "metadata": {
+        "description": "The region to deploy the resources into"
+      }
+    },
+
+    "vmSize": {
+      "type": "string",
+      "allowedValues": [
+        "Standard_D1",
+        "Standard_DS1",
+        "Standard_D2",
+        "Standard_DS2",
+        "Standard_D3",
+        "Standard_DS3",
+        "Standard_D4",
+        "Standard_DS4",
+        "Standard_D11",
+        "Standard_DS11",
+        "Standard_D12",
+        "Standard_DS12",
+        "Standard_D13",
+        "Standard_DS13",
+        "Standard_D14",
+        "Standard_DS14"
+      ],
+      "metadata": {
+        "description": "The size of the AD VMs Created"
+      },
+      "defaultValue": "Standard_D1"
+    },
+    "nicSubnetUri": {
+      "type": "string",
+      "metadata": {
+        "description": "the reference to the subnet of nics"
+      }
+    },
+
+    "lbSubnetUri": {
+      "type": "string",
+      "metadata": {
+        "description": "the reference to the subnet for load balancer"
+      }
+    },
+
+    "sqlDiskSize": {
+      "type": "int",
+      "metadata": {
+        "description": "The address of Primary AD"
+      },
+      "defaultValue": 1000
+    },
+
+    "sqlLBIPAddress": {
+      "type": "string",
+      "metadata": {
+        "description": "The address of secondary AD"
+      },
+      "defaultValue" : "10.0.0.200"
+    }
+  },
+  "variables": {
+    "publicLBName": "AZNE-TMDSQLLB",
+    "sqlAOListener":"SQLAlwaysOnEndPointListener",
+    "publicIPAddressName": "[concat(parameters('availabilitySetName'), 'PublicIp')]",
+    "lbFE": "SqlLBFE",
+    "lbBE": "SqlLBBE",
+    "sqlNicName": "AZNE-SQLNic-",
+    "vmContainerName": "vhds",
+    "sqllbID":"[resourceId('Microsoft.Network/loadBalancers',variables('publicLBName'))]",
+    "sqllbFEConfigID": "[concat(variables('sqllbID'),'/frontendIPConfigurations/',variables('lbFE'))]",
+    "sqlBEAddressPoolID": "[concat(variables('sqllbID'),'/backendAddressPools/',variables('lbBE'))]",
+    "sqlAOProbe":"SQLAlwaysOnEndPointProbe",
+    "sqllbProbeID":"[concat(variables('sqllbID'),'/probes/',variables('sqlAOProbe'))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "name": "[concat(parameters('storageAccount'), copyindex(1))]",
+      "apiVersion": "2015-05-01-preview",
+      "copy": {
+        "name": "storageAccountLoop",
+        "count": 2
+      },
+      "location": "[parameters('location')]",
+      "properties": {
+      "accountType": "[parameters('storageAccountType')]"
+      }
+    },
+
+    {
+      "name": "[concat(variables('sqlNicName'), copyindex(1))]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "location": "[parameters('location')]",
+      "apiVersion": "2015-05-01-preview",
+      "copy": {
+        "name": "nicLoop",
+        "count": 2
+      },
+      "dependsOn": [
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "subnet": {
+                "id": "[parameters('nicSubnetUri')]"
+              },
+              "loadBalancerBackendAddressPools": [
+                {
+                  "id":"[variables('sqlBEAddressPoolID')]"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "2015-05-01-preview",
+      "type": "Microsoft.Compute/virtualMachines",
+      "name": "[concat(parameters('vmNamePrefix'), copyindex(1))]",
+      "location": "[parameters('location')]",
+      "copy": {
+        "name": "virtualMachineLoop",
+        "count": 2
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts',concat(parameters('storageAccount'),  copyindex(1)))]",
+        "[resourceId('Microsoft.Network/networkInterfaces',concat(variables('sqlNicName'), copyindex(1)))]"
+      ],
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[parameters('vmSize')]"
+        },
+        "availabilitySet": {
+          "id": "[resourceId('Microsoft.Compute/availabilitySets', parameters('availabilitySetName'))]"
+        },
+        "osProfile": {
+          "computerName": "[concat(parameters('vmNamePrefix'), copyindex(1))]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "adminPassword": "[parameters('adminPassword')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "[parameters('windowsImagePublisher')]",
+            "offer": "[parameters('windowsImageOffer')]",
+            "sku": "[parameters('windowsImageSKU')]",
+            "version": "[parameters('windowsImageVersion')]"
+          },
+          "osDisk": {
+            "name": "osdisk",
+            "vhd": {
+              "uri": "[concat('http://',parameters('storageAccount'),copyindex(1), '.blob.core.windows.net/',variables('vmContainerName'),'/', parameters('vmNamePrefix'), copyindex(1),'-osdisk.vhd')]"
+            },
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          },
+          "dataDisks": [
+            {
+              "vhd": {
+                "uri":"[concat('http://',parameters('storageAccount'), copyindex(1), '.blob.core.windows.net/',variables('vmContainerName'),'/', parameters('vmNamePrefix'), copyindex(1),'data-1.vhd')]"
+              },
+              "name":"[concat(parameters('vmNamePrefix'), copyindex(1),'data-1.vhd')]",
+              "caching" : "None",
+              "createOption": "empty",
+              "diskSizeGB": "[parameters('sqlDiskSize')]",
+              "lun": 0
+            },
+            {
+              "vhd": {
+                "uri":"[concat('http://',parameters('storageAccount'), copyindex(1), '.blob.core.windows.net/',variables('vmContainerName'),'/', parameters('vmNamePrefix'), copyindex(1),'data-2.vhd')]"
+              },
+              "name":"[concat(parameters('vmNamePrefix'), copyindex(1),'data-2.vhd')]",
+              "caching" : "None",
+              "createOption": "empty",
+              "diskSizeGB": "[parameters('sqlDiskSize')]",
+              "lun": 1
+            },
+            {
+              "vhd": {
+                "uri":"[concat('http://',parameters('storageAccount'), copyindex(1), '.blob.core.windows.net/',variables('vmContainerName'),'/', parameters('vmNamePrefix'), copyindex(1),'data-3.vhd')]"
+              },
+              "name":"[concat(parameters('vmNamePrefix'), copyindex(1),'data-3.vhd')]",
+              "caching" : "None",
+              "createOption": "empty",
+              "diskSizeGB": "[parameters('sqlDiskSize')]",
+              "lun": 2
+            },
+            {
+              "vhd": {
+                "uri":"[concat('http://',parameters('storageAccount'), copyindex(1), '.blob.core.windows.net/',variables('vmContainerName'),'/', parameters('vmNamePrefix'), copyindex(1),'data-4.vhd')]"
+              },
+              "name":"[concat(parameters('vmNamePrefix'), copyindex(1),'data-4.vhd')]",
+              "caching" : "None",
+              "createOption": "empty",
+              "diskSizeGB": "[parameters('sqlDiskSize')]",
+              "lun": 3
+            },
+            {
+              "vhd": {
+                "uri":"[concat('http://',parameters('storageAccount'), copyindex(1), '.blob.core.windows.net/',variables('vmContainerName'),'/', parameters('vmNamePrefix'), copyindex(1),'data-5.vhd')]"
+              },
+              "name":"[concat(parameters('vmNamePrefix'), copyindex(1),'data-5.vhd')]",
+              "caching" : "None",
+              "createOption": "empty",
+              "diskSizeGB": "[parameters('sqlDiskSize')]",
+              "lun": 4
+            },
+            {
+              "vhd": {
+                "uri":"[concat('http://',parameters('storageAccount'), copyindex(1), '.blob.core.windows.net/',variables('vmContainerName'),'/', parameters('vmNamePrefix'), copyindex(1),'data-6.vhd')]"
+              },
+              "name":"[concat(parameters('vmNamePrefix'), copyindex(1),'data-6.vhd')]",
+              "caching" : "None",
+              "createOption": "empty",
+              "diskSizeGB": "[parameters('sqlDiskSize')]",
+              "lun": 5
+            },
+            {
+              "vhd": {
+                "uri":"[concat('http://',parameters('storageAccount'), copyindex(1), '.blob.core.windows.net/',variables('vmContainerName'),'/', parameters('vmNamePrefix'), copyindex(1),'data-7.vhd')]"
+              },
+              "name":"[concat(parameters('vmNamePrefix'), copyindex(1),'data-7.vhd')]",
+              "caching" : "None",
+              "createOption": "empty",
+              "diskSizeGB": "[parameters('sqlDiskSize')]",
+              "lun": 6
+            },
+            {
+              "vhd": {
+                "uri":"[concat('http://',parameters('storageAccount'), copyindex(1), '.blob.core.windows.net/',variables('vmContainerName'),'/', parameters('vmNamePrefix'), copyindex(1),'data-8.vhd')]"
+              },
+              "name":"[concat(parameters('vmNamePrefix'), copyindex(1),'data-8.vhd')]",
+              "caching" : "None",
+              "createOption": "empty",
+              "diskSizeGB": "[parameters('sqlDiskSize')]",
+              "lun": 7
+            },
+            {
+              "vhd": {
+                "uri":"[concat('http://',parameters('storageAccount'), copyindex(1), '.blob.core.windows.net/',variables('vmContainerName'),'/', parameters('vmNamePrefix'), copyindex(1),'log-1.vhd')]"
+              },
+              "name":"[concat(parameters('vmNamePrefix'), copyindex(1),'log-1.vhd')]",
+              "caching" : "None",
+              "createOption": "empty",
+              "diskSizeGB": "[parameters('sqlDiskSize')]",
+              "lun": 8
+            },
+            {
+              "vhd": {
+                "uri":"[concat('http://',parameters('storageAccount'), copyindex(1), '.blob.core.windows.net/',variables('vmContainerName'),'/', parameters('vmNamePrefix'), copyindex(1),'log-2.vhd')]"
+              },
+              "name":"[concat(parameters('vmNamePrefix'), copyindex(1),'log-2.vhd')]",
+              "caching" : "None",
+              "createOption": "empty",
+              "diskSizeGB": "[parameters('sqlDiskSize')]",
+              "lun": 9
+            },
+            {
+              "vhd": {
+                "uri":"[concat('http://',parameters('storageAccount'), copyindex(1), '.blob.core.windows.net/',variables('vmContainerName'),'/', parameters('vmNamePrefix'), copyindex(1),'log-3.vhd')]"
+              },
+              "name":"[concat(parameters('vmNamePrefix'), copyindex(1),'log-3.vhd')]",
+              "caching" : "None",
+              "createOption": "empty",
+              "diskSizeGB": "[parameters('sqlDiskSize')]",
+              "lun": 10
+            },
+            {
+              "vhd": {
+                "uri":"[concat('http://',parameters('storageAccount'), copyindex(1), '.blob.core.windows.net/',variables('vmContainerName'),'/', parameters('vmNamePrefix'), copyindex(1),'log-4.vhd')]"
+              },
+              "name":"[concat(parameters('vmNamePrefix'), copyindex(1),'log-4.vhd')]",
+              "caching" : "None",
+              "createOption": "empty",
+              "diskSizeGB": "[parameters('sqlDiskSize')]",
+              "lun": 11
+            },
+            {
+              "vhd": {
+                "uri":"[concat('http://',parameters('storageAccount'), copyindex(1), '.blob.core.windows.net/',variables('vmContainerName'),'/', parameters('vmNamePrefix'), copyindex(1),'log-5.vhd')]"
+              },
+              "name":"[concat(parameters('vmNamePrefix'), copyindex(1),'log-5.vhd')]",
+              "caching" : "None",
+              "createOption": "empty",
+              "diskSizeGB": "[parameters('sqlDiskSize')]",
+              "lun": 12
+            },
+            {
+              "vhd": {
+                "uri":"[concat('http://',parameters('storageAccount'), copyindex(1), '.blob.core.windows.net/',variables('vmContainerName'),'/', parameters('vmNamePrefix'), copyindex(1),'log-6.vhd')]"
+              },
+              "name":"[concat(parameters('vmNamePrefix'), copyindex(1),'log-6.vhd')]",
+              "caching" : "None",
+              "createOption": "empty",
+              "diskSizeGB": "[parameters('sqlDiskSize')]",
+              "lun": 13
+            },
+            {
+              "vhd": {
+                "uri":"[concat('http://',parameters('storageAccount'), copyindex(1), '.blob.core.windows.net/',variables('vmContainerName'),'/', parameters('vmNamePrefix'), copyindex(1),'log-7.vhd')]"
+              },
+              "name":"[concat(parameters('vmNamePrefix'), copyindex(1),'log-7.vhd')]",
+              "caching" : "None",
+              "createOption": "empty",
+              "diskSizeGB": "[parameters('sqlDiskSize')]",
+              "lun": 14
+            },
+            {
+              "vhd": {
+                "uri":"[concat('http://',parameters('storageAccount'), copyindex(1), '.blob.core.windows.net/',variables('vmContainerName'),'/', parameters('vmNamePrefix'), copyindex(1),'log-8.vhd')]"
+              },
+              "name":"[concat(parameters('vmNamePrefix'), copyindex(1),'log-8.vhd')]",
+              "caching" : "None",
+              "createOption": "empty",
+              "diskSizeGB": "[parameters('sqlDiskSize')]",
+              "lun": 15
+            }
+          ]
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(variables('sqlNicName'), copyindex(1)))]"
+            }
+          ]
+        }
+      }
+    }
+  ],
+    "outputs": {
+    }
+}
