@@ -194,7 +194,7 @@
       "metadata": {
         "description": "The location of resources that the script is dependent on such as linked templates and DSC modules"
       },
-      "defaultValue": "https://raw.githubusercontent.com/atompkins/Core-Build/master"
+      "defaultValue": "https://raw.githubusercontent.com/atompkins/AzureTemplates/master/Core-Build"
     },
 
     "location": {
