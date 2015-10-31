@@ -79,7 +79,7 @@
       "metadata": {
         "description": "The location of resources that the script is dependent on such as linked templates and DSC modules"
       },
-      "defaultValue": "https://raw.githubusercontent.com/atompkins/Prepare-Always-On/master"
+      "defaultValue": "https://raw.githubusercontent.com/atompkins/AzureTemplates/master/Prepare%20Always%20On"
     }
   },
   "variables": {
