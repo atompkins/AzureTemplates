@@ -1,0 +1,72 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+  },
+  "variables": {
+    "location": "North Europe",
+    "virtualNetworkName": "AZNEVNET",
+    "subnetName": "ADNE-CoreSubnetP",
+    "loadBalancerName": "loadBalancer1",
+    "vnetID": "[resourceId('AZNE-RG-Core', 'Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
+    "subnetRef": "[concat(variables('vnetID'),'/subnets/', variables('subnetName'))]",
+  },
+  "resources": [
+    {
+      "apiVersion": "2015-06-15",
+      "name": "[variables('loadBalancerName')]",
+      "type": "Microsoft.Network/loadBalancers",
+      "location": "[variables('location')]",
+      "dependsOn": [
+      ],
+      "properties": {
+        "frontendIPConfigurations": [
+          {
+            "name": "loadBalancerFrontEnd",
+            "properties": {
+              "subnet": {
+                "id": "[variables('subnetRef')]"
+              }
+            }
+          }
+        ],
+        "backendAddressPools": [
+          {
+            "name": "loadBalancerBackEnd"
+          }
+        ],
+        "loadBalancingRules": [
+          {
+            "properties": {
+              "frontendIPConfiguration": {
+                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancerName')), '/frontendIpConfigurations/loadBalancerFrontEnd')]"
+              },
+              "backendAddressPool": {
+                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancerName')), '/backendAddressPools/loadBalancerBackEnd')]"
+              },
+              "probe": {
+                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancerName')), '/probes/lbprobe')]"
+              },
+              "protocol": "Tcp",
+              "frontendPort": 80,
+              "backendPort": 80,
+              "idleTimeoutInMinutes": 15
+            },
+            "name": "lbrule"
+          }
+        ],
+        "probes": [
+          {
+            "properties": {
+              "protocol": "Tcp",
+              "port": 80,
+              "intervalInSeconds": 15,
+              "numberOfProbes": 2
+            },
+            "name": "lbprobe"
+          }
+        ]
+      }
+    }
+  ]
+}
