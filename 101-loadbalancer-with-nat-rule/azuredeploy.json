@@ -5,12 +5,12 @@
     "location": "North Europe",
     "existingVirtualNetworkResourceGroup": "AZNE-RG-Core",
     "existingVirtualNetworkName": "AZNEVNET",
-    "subnetName": "AZNE-TMDSSubnetP",
+    "subnetName": "AZNE-CoreSubnetP",
 
 
     "dnsNameforLBIP": "azne-tmdsql2",
-    "publicIPAddressName": "AZNETMDSQL2PublicIP",
-    "loadBalancerName": "AZNE-TMDSQL2",
+    "publicIPAddressName": "AZNEAD2PublicIP",
+    "loadBalancerName": "AZNE-AD2LB",
 
 
     "vnetID": "[resourceId(variables('existingVirtualNetworkResourceGroup'), 'Microsoft.Network/virtualNetworks', variables('existingVirtualNetworkName'))]",
