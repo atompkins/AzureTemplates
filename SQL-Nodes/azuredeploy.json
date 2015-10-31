@@ -121,7 +121,7 @@
       "metadata": {
         "description": "The location of resources that the script is dependent on such as linked templates and DSC modules"
       },
-      "defaultValue": "https://raw.githubusercontent.com/atompkins/SQL-Nodes/master"
+      "defaultValue": "https://raw.githubusercontent.com/atompkins/AzureTemplates/master/SQL-Nodes"
     },
 
     "location": {
@@ -245,87 +245,6 @@
           "sqlLBIPAddress": { "value": "[parameters('sqlLBIPAddress')]" },
           "vmSize": { "value": "[parameters('sqlVMSize')]" },
           "availabilitySetName": { "value": "[variables('sqlAvailabilitySetName')]" }
-        }
-      }
-    },
-    {
-      "name": "[variables('updateSQLCNic1')]",
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2015-01-01",
-      "dependsOn": [
-        "[variables('deploySqlClusterVmsId')]"
-      ],
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[variables('nicTemplateURL')]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "location": {
-            "value": "[parameters('location')]"
-          },
-          "nicName": {
-            "value": "[variables('sqlNicName1')]"
-          },
-          "ipConfigurations": {
-            "value": [
-              {
-                "name": "ipconfig1",
-                "properties": {
-                  "privateIPAllocationMethod": "Dynamic",
-                  "subnet": {
-                    "id": "[variables('sqlSubnetRef')]"
-                  }
-                }
-              }
-            ]
-          },
-          "dnsServers": {
-            "value": [ "[parameters('primaryAdIpAddress')]", "[parameters('secondaryIpAddress')]" ]
-          }
-
-        }
-      }
-    },
-    {
-      "name": "[variables('updateSQLCNic2')]",
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2015-01-01",
-      "dependsOn": [
-        "[variables('deploySqlClusterVmsId')]",
-        "[variables('updateSQLCNic1Id')]"
-      ],
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[variables('nicTemplateURL')]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "location": {
-            "value": "[parameters('location')]"
-          },
-          "nicName": {
-            "value": "[variables('sqlNicName2')]"
-          },
-          "ipConfigurations": {
-            "value": [
-              {
-                "name": "ipconfig1",
-                "properties": {
-                  "privateIPAllocationMethod": "Dynamic",
-                  "subnet": {
-                    "id": "[variables('sqlSubnetRef')]"
-                  }
-                }
-              }
-            ]
-          },
-          "dnsServers": {
-            "value": [ "[parameters('primaryAdIpAddress')]", "[parameters('secondaryIpAddress')]" ]
-          }
-
         }
       }
     }

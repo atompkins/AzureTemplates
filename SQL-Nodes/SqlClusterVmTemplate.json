@@ -29,7 +29,7 @@
       "metadata": {
         "description": "The offer of Windows Image"
       },
-      "defaultValue": "SQL2014-WS2012R2"
+      "defaultValue": "SQL2014SP1-WS2012R2"
     },
     "windowsImageSKU": {
       "type": "string",
