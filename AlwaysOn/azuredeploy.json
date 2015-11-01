@@ -151,7 +151,7 @@
       "metadata": {
         "description": "The address of sql LB IP"
       },
-      "defaultValue": "10.210.1.10"
+      "defaultValue": "10.210.10.10"
     },
 
     "dataBaseNames": {
