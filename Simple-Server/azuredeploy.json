@@ -58,6 +58,12 @@
       },
       "defaultValue": "Standard_D1"
     },
+    "availabilitySetName": {
+      "type": "string",
+      "metadata": {
+        "description": "The Available Set Name"
+      }
+    },
     "adminUsername": {
       "type": "string",
       "metadata": {
@@ -139,6 +145,12 @@
   },
   "resources": [
     {
+      "type": "Microsoft.Compute/availabilitySets",
+      "name": "[parameters('availabilitySetName')]",
+      "apiVersion": "2015-06-15",
+      "location": "[parameters('location')]"
+    },
+    {
       "type": "Microsoft.Storage/storageAccounts",
       "name": "[parameters('newStorageAccountName')]",
       "apiVersion": "2015-06-15",
@@ -190,12 +202,16 @@
       "name": "[parameters('vmName')]",
       "location": "[parameters('location')]",
       "dependsOn": [
+        "[resourceId('Microsoft.Compute/availabilitySets', parameters('availabilitySetName'))]",
         "[concat('Microsoft.Storage/storageAccounts/', parameters('newStorageAccountName'))]",
         "[concat('Microsoft.Network/networkInterfaces/', parameters('nicName'))]"
       ],
       "properties": {
         "hardwareProfile": {
           "vmSize": "[parameters('vmSize')]"
+        },
+        "availabilitySet": {
+          "id": "[resourceId('Microsoft.Compute/availabilitySets', parameters('availabilitySetName'))]"
         },
         "osProfile": {
           "computername": "[parameters('vmName')]",
