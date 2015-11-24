@@ -243,7 +243,7 @@
     },
     {
       "type": "Microsoft.Compute/virtualMachines/extensions",
-      "name": "vm/domainjoin",
+      "name": "[concat(parameters('vmName'),'/domainjoin')]",
       "apiVersion": "2015-06-15",
       "location": "[resourceGroup().location]",
       "dependsOn": [
