@@ -58,12 +58,6 @@
       },
       "defaultValue": "Standard_D1"
     },
-    "availabilitySetName": {
-      "type": "string",
-      "metadata": {
-        "description": "The Available Set Name"
-      }
-    },
     "adminUsername": {
       "type": "string",
       "metadata": {
@@ -93,12 +87,6 @@
       ],
       "metadata": {
         "description": "The Windows version for the VM. This will pick a fully patched image of this given Windows version. Allowed values: 2008-R2-SP1, 2012-Datacenter, 2012-R2-Datacenter, Windows-Server-Technical-Preview."
-      }
-    },
-    "sizeOfDiskInGB": {
-      "type": "string",
-      "metadata": {
-        "description": "Size of the empty data disk in GB"
       }
     },
     "nicName": {
@@ -159,12 +147,6 @@
   },
   "resources": [
     {
-      "type": "Microsoft.Compute/availabilitySets",
-      "name": "[parameters('availabilitySetName')]",
-      "apiVersion": "2015-06-15",
-      "location": "[parameters('location')]"
-    },
-    {
       "type": "Microsoft.Storage/storageAccounts",
       "name": "[parameters('newStorageAccountName')]",
       "apiVersion": "2015-06-15",
@@ -216,16 +198,12 @@
       "name": "[parameters('vmName')]",
       "location": "[parameters('location')]",
       "dependsOn": [
-        "[resourceId('Microsoft.Compute/availabilitySets', parameters('availabilitySetName'))]",
         "[concat('Microsoft.Storage/storageAccounts/', parameters('newStorageAccountName'))]",
         "[concat('Microsoft.Network/networkInterfaces/', parameters('nicName'))]"
       ],
       "properties": {
         "hardwareProfile": {
           "vmSize": "[parameters('vmSize')]"
-        },
-        "availabilitySet": {
-          "id": "[resourceId('Microsoft.Compute/availabilitySets', parameters('availabilitySetName'))]"
         },
         "osProfile": {
           "computername": "[parameters('vmName')]",
@@ -246,18 +224,7 @@
             },
             "caching": "ReadWrite",
             "createOption": "FromImage"
-          },
-          "dataDisks": [
-            {
-              "name": "datadisk1",
-              "diskSizeGB": "[parameters('sizeOfDiskInGB')]",
-              "lun": 0,
-              "vhd": {
-                "Uri": "[variables('dataDisk1VhdName')]"
-              },
-              "createOption": "Empty"
-            }
-          ]
+          }
         },
         "networkProfile": {
           "networkInterfaces": [
