@@ -193,7 +193,7 @@
       "metadata": {
         "description": "The location of resources such as templates and DSC modules that the script is dependent"
       },
-      "defaultValue": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/active-directory-new-domain"
+      "defaultValue": "https://raw.githubusercontent.com/atompkins/AzureTemplates/master/active-directory-new-domain"
     }
   },
   "variables": {
@@ -220,14 +220,14 @@
     {
       "type": "Microsoft.Storage/storageAccounts",
       "name": "[parameters('newStorageAccountName')]",
-      "apiVersion": "2015-05-01-preview",
+      "apiVersion": "2015-06-15",
       "location": "[parameters('location')]",
       "properties": {
         "accountType": "[parameters('storageAccountType')]"
       }
     },
     {
-      "apiVersion": "2015-05-01-preview",
+      "apiVersion": "2015-06-15",
       "type": "Microsoft.Network/publicIPAddresses",
       "name": "[parameters('publicIPAddressName')]",
       "location": "[parameters('location')]",
@@ -241,13 +241,13 @@
     {
       "type": "Microsoft.Compute/availabilitySets",
       "name": "[parameters('adAvailabilitySetName')]",
-      "apiVersion": "2015-05-01-preview",
+      "apiVersion": "2015-06-15",
       "location": "[parameters('location')]"
     },
     {
       "name": "VNet",
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2015-01-01",
+      "apiVersion": "2015-06-15",
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -274,7 +274,7 @@
       }
     },
     {
-      "apiVersion": "2015-05-01-preview",
+      "apiVersion": "2015-06-15",
       "name": "[variables('adlbName')]",
       "type": "Microsoft.Network/loadBalancers",
       "location": "[parameters('location')]",
@@ -321,7 +321,7 @@
         "Microsoft.Resources/deployments/VNet",
         "[concat('Microsoft.Network/loadBalancers/',variables('adlbName'))]"
       ],
-      "apiVersion": "2015-05-01-preview",
+      "apiVersion": "2015-06-15",
       "properties": {
         "ipConfigurations": [
           {
@@ -348,7 +348,7 @@
       }
     },
     {
-      "apiVersion": "2015-05-01-preview",
+      "apiVersion": "2015-06-15",
       "type": "Microsoft.Compute/virtualMachines",
       "name": "[parameters('adVMName')]",
       "location": "[parameters('location')]",
@@ -410,7 +410,7 @@
         {
           "type": "Microsoft.Compute/virtualMachines/extensions",
           "name": "[concat(parameters('adVMName'),'/CreateADForest')]",
-          "apiVersion": "2015-05-01-preview",
+          "apiVersion": "2015-06-15",
           "location": "[parameters('location')]",
           "dependsOn": [
             "[resourceId('Microsoft.Compute/virtualMachines', parameters('adVMName'))]"
@@ -442,7 +442,7 @@
     {
       "name": "UpdateVNetDNS",
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2015-01-01",
+      "apiVersion": "2015-06-15",
       "dependsOn": [
         "[concat('Microsoft.Compute/virtualMachines/', parameters('adVMName'),'/extensions/CreateADForest')]"
       ],
