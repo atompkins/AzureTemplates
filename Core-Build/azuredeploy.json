@@ -236,7 +236,7 @@
     }
   },
   "variables": {
-    "staticSubnetName": "ADStaticSubnet",
+    "staticSubnetName": "adne-coresubnetd",
     "subnets": [
       {
         "name": "[variables('staticSubnetName')]",
@@ -251,7 +251,7 @@
         }
       }
     ],
-    "virtualNetworkName": "WorkloadVNET",
+    "virtualNetworkName": "azne-rd-vnet",
     "vnetID": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
     "staticSubnetRef": "[concat(variables('vnetID'),'/subnets/',variables('staticSubnetName'))]",
     "adTemplateURL": "[concat(parameters('assetLocation'),'/ADVmTemplate.json')]",
@@ -267,7 +267,7 @@
     "deploySecondaryAdName": "deploySecondaryAdName",
     "deploySecondaryAdNameId": "[concat('Microsoft.Resources/deployments/', variables('deploySecondaryAdName'))]",
 
-    "sqlSubnetName": "sqlSubnet",
+    "sqlSubnetName": "azne-tmdssubnetd",
     "sqlSubnetRef": "[concat(variables('vnetID'),'/subnets/',variables('sqlSubnetName'))]",
     "sqlStorageName": "[concat(parameters('newStorageAccountNamePrefix'),'sqlsa')]",
     "sqlClusterTemplateURL": "[concat(parameters('assetLocation'),'/SqlClusterVmTemplate.json')]",
@@ -279,9 +279,9 @@
     "deploySqlWitnessVms": "deploySqlWitnessVms",
     "deploySqlWitnessVmsId": "[concat('Microsoft.Resources/deployments/', variables('deploySqlWitnessVms'))]",
 
-    "adVmNamePrefix": "[concat(parameters('vmNamePrefix'),'-AD-')]",
-    "adPDCVMName": "[concat(variables('adVmNamePrefix'),'0')]",
-    "adBDCVMName": "[concat(variables('adVmNamePrefix'),'1')]",
+    "adVmNamePrefix": "[concat(parameters('vmNamePrefix'),'0')]",
+    "adPDCVMName": "[concat(variables('adVmNamePrefix'),'1')]",
+    "adBDCVMName": "[concat(variables('adVmNamePrefix'),'2')]",
     "vnetwithDNSTemplateUri": "[concat(parameters('assetLocation'),'/vnet-with-dns-server.json')]",
     "updateVNetDNS1": "updateVNetDNS1",
     "updateVNetDNS1Id": "[concat('Microsoft.Resources/deployments/', variables('updateVNetDNS1'))]",
