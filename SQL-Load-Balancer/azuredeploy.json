@@ -6,16 +6,16 @@
   },
   "variables": {
     "location": "North Europe",
-    "staticSubnetName": "AZNE-TMDSSubnetP",
-    "existingVirtualNetworkName": "AZNEVNET",
-    "existingVirtualNetworkResourceGroup": "AZNE-RG-Core",
-    "sqlLBIPAddress": "10.210.10.10",
+    "staticSubnetName": "azne-tmdssubnetd",
+    "existingVirtualNetworkName": "azne-rd-vnet",
+    "existingVirtualNetworkResourceGroup": "AZNE-RD-RG-Core",
+    "sqlLBIPAddress": "10.210.11.10",
 
     "vnetID": "[resourceId(variables('existingVirtualNetworkResourceGroup'), 'Microsoft.Network/virtualNetworks', variables('existingVirtualNetworkName'))]",
 
     "lbSubnetUri": "[concat(variables('vnetID'),'/subnets/',variables('staticSubnetName'))]",
 
-    "publicLBName": "AZNE-TMDSQLLB",
+    "publicLBName": "azne-rd-tmdsqllb",
     "sqlAOListener":"SQLAlwaysOnEndPointListener",
     "lbFE": "SqlLBFE",
     "lbBE": "SqlLBBE",
