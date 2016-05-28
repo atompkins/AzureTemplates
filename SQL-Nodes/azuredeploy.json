@@ -208,7 +208,7 @@
     "deploySqlAlwaysOn": "deploySqlAlwaysOn",
     "deploySqlAlwaysOnTemplateUrl": "[concat(parameters('assetLocation'),'/DeploySqlAlwaysOn.json')]",
 
-    "sqlClusterVmNamePrefix": "[concat(parameters('vmNamePrefix'),'-tmdsqld10')]",
+    "sqlClusterVmNamePrefix": "[concat(parameters('vmNamePrefix'),'tmdsqld10')]",
     "sqlCVMName1": "[concat(variables('sqlClusterVmNamePrefix'),'1')]",
     "sqlCVMName2": "[concat(variables('sqlClusterVmNamePrefix'),'2')]",
 
