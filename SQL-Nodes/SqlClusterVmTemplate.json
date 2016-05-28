@@ -159,12 +159,12 @@
     }
   },
   "variables": {
-    "publicLBName": "AZNE-TMDSQLLB",
+    "publicLBName": "azne-rd-tmdsqllb",
     "sqlAOListener":"SQLAlwaysOnEndPointListener",
     "publicIPAddressName": "[concat(parameters('availabilitySetName'), 'PublicIp')]",
     "lbFE": "SqlLBFE",
     "lbBE": "SqlLBBE",
-    "sqlNicName": "AZNE-SQLNic-",
+    "sqlNicName": "azne-rd-sqlnic-",
     "vmContainerName": "vhds",
     "sqllbID":"[resourceId('Microsoft.Network/loadBalancers',variables('publicLBName'))]",
     "sqllbFEConfigID": "[concat(variables('sqllbID'),'/frontendIPConfigurations/',variables('lbFE'))]",

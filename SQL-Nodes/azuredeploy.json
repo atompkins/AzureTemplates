@@ -151,7 +151,7 @@
       "metadata": {
         "description": "The address of sql LB IP"
       },
-      "defaultValue": "10.210.1.10"
+      "defaultValue": "10.210.11.10"
     },
 
     "dataBaseNames": {
@@ -182,7 +182,7 @@
     }
   },
   "variables": {
-    "staticSubnetName": "ADNE-CoreSubnetP",
+    "staticSubnetName": "adne-coresubnetd",
 
     "vnetID": "[resourceId(parameters('existingVirtualNetworkResourceGroup'), 'Microsoft.Network/virtualNetworks', parameters('existingVirtualNetworkName'))]",
 
@@ -199,26 +199,26 @@
 
     "updateSQLCNic1": "updateSQLCNic1",
     "updateSQLCNic1Id": "[concat('Microsoft.Resources/deployments/', variables('updateSQLCNic1'))]",
-    "sqlNicName1": "AZNE-SQLNic-1",
+    "sqlNicName1": "azne-rd-sqlnic-1",
 
     "updateSQLCNic2": "updateSQLCNic2",
     "updateSQLCNic2Id": "[concat('Microsoft.Resources/deployments/', variables('updateSQLCNic2'))]",
-    "sqlNicName2": "AZNE-SQLNic-2",
+    "sqlNicName2": "azne-rd-sqlnic-2",
 
     "deploySqlAlwaysOn": "deploySqlAlwaysOn",
     "deploySqlAlwaysOnTemplateUrl": "[concat(parameters('assetLocation'),'/DeploySqlAlwaysOn.json')]",
 
-    "sqlClusterVmNamePrefix": "[concat(parameters('vmNamePrefix'),'-TMDSQLP10')]",
+    "sqlClusterVmNamePrefix": "[concat(parameters('vmNamePrefix'),'-tmdsqld10')]",
     "sqlCVMName1": "[concat(variables('sqlClusterVmNamePrefix'),'1')]",
     "sqlCVMName2": "[concat(variables('sqlClusterVmNamePrefix'),'2')]",
 
-    "sqlLBName": "AZNE-TMDSQLLB",
+    "sqlLBName": "azne-rd-tmdsqllb",
 
     "sqlAOEPName": "[concat(parameters('dnsPrefix'),'-hadr')]",
     "sqlAOAGName": "[concat(parameters('dnsPrefix'),'-ag')]",
     "sqlAOListenerName": "[concat(parameters('dnsPrefix'),'ag-listener')]",
 
-    "sqlAvailabilitySetName": "AZNESQLAvailabilitySet"
+    "sqlAvailabilitySetName": "AZNE-RD-RG-TMDS-SQLAvailabilitySet"
   },
 
   "resources": [
