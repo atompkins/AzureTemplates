@@ -324,7 +324,7 @@
     "deploySqlWitnessShareId": "[concat('Microsoft.Resources/deployments/', variables('deploySqlWitnessShare'))]",
     "deploySqlWitnessShareTemplateUrl": "[concat(parameters('assetLocation'),'/DeploySqlWitnessShare.json')]",
     "sqlWitnessSharePath" : "[concat(parameters('dnsPrefix'),'-fsw')]",
-    "sqlWitnessVmNamePrefix": "[concat(parameters('vmNamePrefix'),'-TMDWITP10')]",
+    "sqlWitnessVmNamePrefix": "[concat(parameters('vmNamePrefix'),'-tmdwitd10')]",
     "sqlwVMName": "[concat(variables('sqlWitnessVmNamePrefix'),'1')]",
 
     "deploySqlAlwaysOn": "deploySqlAlwaysOn",

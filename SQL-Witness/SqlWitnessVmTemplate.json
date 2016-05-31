@@ -146,7 +146,7 @@
     }
   },
   "variables": {
-    "sqlWitnessNicName": "AZNE-SQLWitNic-1",
+    "sqlWitnessNicName": "AZNE-RD-SQLWitNic-1",
     "vmContainerName": "vhds"
   },
   "resources": [
