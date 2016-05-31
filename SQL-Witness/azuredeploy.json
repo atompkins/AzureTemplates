@@ -340,7 +340,7 @@
     "sqlAOAGName": "[concat(parameters('dnsPrefix'),'-ag')]",
     "sqlAOListenerName": "[concat(parameters('dnsPrefix'),'ag-listener')]",
 
-    "sqlAvailabilitySetName": "AZNESQLAvailabilitySet"
+    "sqlAvailabilitySetName": "AZNE-RD-ADAvailabilitySet"
   },
 
   "resources": [
